@@ -1,3 +1,4 @@
+import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -9,9 +10,11 @@ import java.awt.event.ActionEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
@@ -41,7 +44,13 @@ public class SecondGUI {
 	private JPasswordField setpassword;
 	private JButton btnAddEmployee;
 	private JPanel homepage;
-
+	private JPanel search;
+	private JButton btnNewButton;
+	private Sqlconnection employeeDAO;
+	private JTextField searchlastnamefield;
+	private JScrollPane scrollPane;
+	private JTable table;
+	private JScrollPane scrollPane_1;
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -60,6 +69,10 @@ public class SecondGUI {
 	public SecondGUI() {
 		initialize();
 		connection = Sqlconnection.dbConnector();
+		
+		
+		
+		
 	}
 
 	
@@ -258,6 +271,17 @@ public class SecondGUI {
 		btnAddEmployee.setBounds(285, 35, 143, 28);
 		mainscreen.add(btnAddEmployee);
 		
+		btnNewButton = new JButton("back");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				mainscreen.setVisible(false);
+				homepage.setVisible(true);
+			}
+		});
+		btnNewButton.setBounds(0, 0, 90, 28);
+		mainscreen.add(btnNewButton);
+		
 		homepage = new JPanel();
 		frame.getContentPane().add(homepage, "name_10459822637649");
 		homepage.setLayout(null);
@@ -273,5 +297,77 @@ public class SecondGUI {
 		});
 		btnAddEmployees.setBounds(167, 46, 137, 28);
 		homepage.add(btnAddEmployees);
+		
+		JButton btnSeachEmployees = new JButton("Seach employees");
+		btnSeachEmployees.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				search.setVisible(true);
+				homepage.setVisible(false);
+			}
+		});
+		btnSeachEmployees.setBounds(167, 86, 137, 28);
+		homepage.add(btnSeachEmployees);
+		
+		search = new JPanel();
+		frame.getContentPane().add(search, "name_22414072733360");
+		search.setLayout(null);
+		
+		searchlastnamefield = new JTextField();
+		searchlastnamefield.setBounds(213, 23, 122, 28);
+		search.add(searchlastnamefield);
+		searchlastnamefield.setColumns(10);
+		
+		scrollPane_1 = new JScrollPane();
+		scrollPane_1.setBounds(6, 55, 422, 201);
+		search.add(scrollPane_1);
+		
+		
+		
+		table = new JTable();
+		scrollPane_1.setViewportView(table);
+		
+		JButton btnSearch = new JButton("search");
+		btnSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				connection = Sqlconnection.dbConnector();
+				try {
+					employeeDAO = new Sqlconnection();
+					String lastName = searchlastnamefield.getText();
+
+					List<Employee> employees = null;
+
+					if (lastName != null && lastName.trim().length() > 0) {
+						employees = employeeDAO.searchEmployees(lastName);
+					} else {
+						employees = employeeDAO.getAllEmployees();
+					}
+					
+					
+					EmployeeTableModel model = new EmployeeTableModel(employees);
+					
+					table.setModel(model);
+					
+					
+					
+					connection.close();
+					
+				} catch (Exception exc) {
+					JOptionPane.showMessageDialog(null, exc);
+					
+				}
+				
+				
+				
+				
+			}
+		});
+		btnSearch.setBounds(63, 23, 90, 28);
+		search.add(btnSearch);
+		
+		
+		
+		
+		
 	}
 }
